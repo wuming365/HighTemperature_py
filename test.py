@@ -48,14 +48,12 @@ import time
 # c=''.join(str(i) for i in b)
 # d=np.array([len(i) for i in c.split('0')])
 # print(len(d[d>=3]))
-# time1_end=time.perf_counter()
 # print(time1_end-time1_start)
 # time2_start=time.perf_counter()
 # c=np.split(b,np.where(np.diff(b)<0)[0]+1)
 # d=np.array([np.sum(i) for i in c])
 # print(len(d[d>=3]))
-# time2_end=time.perf_counter()
-# print(time2_end-time2_start)
+
 
 # a=np.array([[[1,2],[2,3]],[[1,2],[2,3]],[[1,3],[1,3]],[[2,4],[4,2]]])
 # a=ma.masked_where(a==1,a)
