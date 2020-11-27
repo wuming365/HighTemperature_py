@@ -35,7 +35,7 @@ for regionname in IMSClip:
     if(IMSClip[regionname] != "Processed"):
         region="IMS_"+regionname+".tif"
         arcpy.gp.RasterCalculator_sa('Con("%s" == 0,0,Con("%s" == 1,0,Con("%s" == 2,1)))' % (region, region, region), path_dirresout+"\\IMS_cal_"+regionname+".tif")  # 双引号在单引号中不需要转义字符，栅格计算的文件必须在arcmap中缓存
-    else: #rename
+    # else: #rename
         
     print("Processing "+regionname)
 """
