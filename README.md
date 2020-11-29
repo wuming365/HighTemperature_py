@@ -47,7 +47,19 @@ regionnames = {
                     'Maldives': 'mdv',
                     'Mumbai': 'ind',
                     'Tashkent': 'uzb',
-                    'Teran': 'irn'
+                    'Teran': 'irn',
+					'Ankara': 'tur',
+                    'Piraeus': 'grc',
+                    'Melaka': 'mys',
+                    'Kuantan': 'mys',
+                    'Hambantota': 'lka',
+                    'Colombo': 'lka',
+                    'Minsk': 'blr',
+                    'Warsaw': 'pol',
+                    'Yawan': 'idn'
+                    'Valencia': 'esp',
+                    'Ekaterinburg': 'rus',
+                    'Novosibirsk': 'rus'
                     }
 
 9.	国家的生产数据 from GBD Results
