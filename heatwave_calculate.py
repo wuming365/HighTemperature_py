@@ -169,7 +169,7 @@ def main():
         name = region
         dirPath1 =os.path.join(dirinputPath,name) 
         outputpath = diroutputPath
-        heatwaveJud(name, precent, dirPath1)
+        heatwaveJud(name, precent, dirPath1,outputpath)
         
 if __name__ == "__main__":
     main()
