@@ -468,15 +468,27 @@ def main():
     }
 
     regionnames = {
-                    'Abbas': 'irn',
-                   'Karachi': 'pak',
-                   'Alexandria': 'egy',
-                   'Gawdar': 'pak',
-                   'Kolkata': 'ind',
-                   'Maldives': 'mdv',
-                   'Mumbai': 'ind',
-                   'Tashkent': 'uzb',
-                   'Teran': 'irn'
+                    # 'Abbas': 'irn',
+                    # 'Karachi': 'pak',
+                    # 'Alexandria': 'egy',
+                    # 'Gawdar': 'pak',
+                    # 'Kolkata': 'ind',
+                    # 'Maldives': 'mdv',
+                    # 'Mumbai': 'ind',
+                    # 'Tashkent': 'uzb',
+                    # 'Teran': 'irn',
+                    'Ankara': 'tur',
+                    'Piraeus': 'grc',
+                    'Melaka': 'mys',
+                    'Kuantan': 'mys',
+                    'Hambantota': 'lka',
+                    'Colombo': 'lka',
+                    'Minsk': 'blr',
+                    'Warsaw': 'pol',
+                    'Yawan': 'idn',
+                    'Valencia': 'esp',
+                    'Ekaterinburg': 'rus',
+                    'Novosibirsk': 'rus'
                 }
 
     with tqdm(regionnames) as t:
