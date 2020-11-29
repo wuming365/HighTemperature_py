@@ -120,15 +120,19 @@ def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
     """计算热浪持续时间"""
     durimg = np.empty((height, width))
     heatwaveimg=np.transpose(heatwaveimg)
-    for j in range(0, width):
-        for i in range(0, height):
-            durimg[i][j] += sum(heatwaveimg[j][i])
+    with tqdm(range(width)) as t:
+        for j in t:
+            for i in range(0, height):
+                durimg[i][j] += sum(heatwaveimg[j][i])
+            t.set_description(f"Processing col{j}")
     print("Heat wave duration has been calculated successfully")
     """计算热浪发生频率"""
     freimg = np.empty((height,width))
-    for i in range(width):
-        for j in range(height):
-            freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
+    with tqdm(range(width)):
+        for i in t:
+            for j in range(height):
+                freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
+            t.set_description(f"Processing col{i}")
     print("Heat wave frequency has been calculated successfully")
     durimg=ma.masked_where(Igs[0]==ndv,durimg)
     freimg=ma.masked_where(Igs[0]==ndv,freimg)
@@ -163,6 +167,7 @@ def main():
             'Ekaterinburg': 'rus',
             'Novosibirsk': 'rus'
         }
+
     for region in regionnames:
         print("#"*120)
         print(region)
