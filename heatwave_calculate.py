@@ -103,48 +103,40 @@ def heatwaveJud(name,percent,dirpath1,outputpath):
     #dirpath1影像所在路径
     #outputpath影像输出路径
     Igs, im_geotrans, im_proj = openImages(dirpath1)
-    durname1 = name + "HT_duration.tif"
-    frename1 = name + "HT_frequency.tif"
+    durname = name + "HT_duration.tif"
+    frename = name + "HT_frequency.tif"
     perImage = GetpercentImages(Igs, percent)
+    Comparevalue=max(perImage,30)
     height, width = Igs[0].shape
     heatwaveimg = []
-    for dirPath, dirname, filenames in os.walk(dirpath1):
-        with tqdm(filenames) as t:
-             for filename in t:
-                 if filename[-4:] == ".tif":
-                     newImage = np.empty((height, width), dtype="int")
-                     Image, im_geotrans, im_proj = openSingleImage(dirPath + "\\" + filename)
-                     height, width = Image.shape
-                     for i in range(0, height):
-                         for j in range(0, width):
-                             if Image[i][j] > max(perImage,30):
-                                 newImage[i][j] = 1
-                             else:
-                                 newImage[i][j] = 0
-                     heatwaveimg.append(newImage)
-                     t.set_description(filename + " has finished")
+    with tqdm(enumerate(Igs)) as t:
+        for i,Ig in t:
+            newImage = np.empty((height, width))
+            newImage[Ig>Comparevalue]=1
+            heatwaveimg.append(newImage)
+            t.set_description(f"Page{i+1} has finished")
     """计算热浪持续时间"""
     durimg = np.empty((height, width))
-    for i in range(0, height):
-        for j in range(0, width):
-            durimg[i][j] += x[i][j]
-    
-    write_img(durimg, durname1, im_proj, im_geotrans, outputpath)
+    heatwaveimg=np.transpose(heatwaveimg)
+    for j in range(0, width):
+        for i in range(0, height):
+            durimg[i][j] += sum(heatwaveimg[j][i])
     print("Heat wave duration has been calculated successfully")
     """计算热浪发生频率"""
-    freimage = np.empty((height,width))
-    heatwaveimg=np.transpose(heatwaveimg)
+    freimg = np.empty((height,width))
+    
     for i in range(width):
         for j in range(height):
-            freimage[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
+            freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
     print("Heat wave frequency has been calculated successfully")
-    write_img(freimg, frename1, im_proj, im_geotrans, outputpath)
+    write_img(durimg, durname, im_proj, im_geotrans, outputpath)
+    write_img(freimg, frename, im_proj, im_geotrans, outputpath)
     # return heatwaveimg, durimg, freimg
 
 def main():
     precent = 95
     dirinputPath=r"G:\extent\4_HTEMPX"
-    diroutputPath=r
+    diroutputPath=r"G:\high_temperture202011\result_data\heatwave"
     regionnames = {
             # 'Abbas': 'irn',
             # 'Karachi': 'pak',
@@ -163,7 +155,7 @@ def main():
             'Colombo': 'lka',
             'Minsk': 'blr',
             'Warsaw': 'pol',
-            'Yawan': 'idn'
+            'Yawan': 'idn',
             'Valencia': 'esp',
             'Ekaterinburg': 'rus',
             'Novosibirsk': 'rus'
