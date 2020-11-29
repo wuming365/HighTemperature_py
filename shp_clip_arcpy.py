@@ -30,7 +30,7 @@ regionnames = {
                 'Colombo': 'lka',
                 'Minsk': 'blr',
                 'Warsaw': 'pol',
-                'Yawan': 'idn'
+                'Yawan': 'idn',
                 'Valencia': 'esp',
                 'Ekaterinburg': 'rus',
                 'Novosibirsk': 'rus'

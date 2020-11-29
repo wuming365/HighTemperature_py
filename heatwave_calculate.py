@@ -2,6 +2,7 @@ import gdal
 import numpy as np
 import os
 import time
+import numpy.ma as ma
 from tqdm import tqdm
 from tqdm import trange
 def openSingleImage(imagefilename):
@@ -15,6 +16,7 @@ def openSingleImage(imagefilename):
     # 如果北边朝上，地图的旋转角度，0表示图像的列与y轴平行；南北方向上地图的分辨率。
     im_proj = dataset.GetProjection()  # 地图投影信息
     im_band = dataset.GetRasterBand(1)
+    ndv=im_band.GetNoDataValue()
     Image = im_band.ReadAsArray(0, 0, im_width, im_height)
     del dataset
     # 关闭图像进程
@@ -96,14 +98,14 @@ def getHeatWaveFreq(b):
     d=np.array([len(i) for i in c.split('0')])
     return len(d[d>=3])
 
-def heatwaveJud(name,percent,dirpath1,outputpath):
+def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
     """判断是否发生热浪"""
     #name节点名称
     #perpath阈值标准所在路径
     #dirpath1影像所在路径
     #outputpath影像输出路径
     Igs, im_geotrans, im_proj = openImages(dirpath1)
-    durname = name + "HT_duration.tif"
+    durname = name + "HT_duration_2015.tif"
     frename = name + "HT_frequency.tif"
     perImage = GetpercentImages(Igs, percent)
     Comparevalue=max(perImage,30)
@@ -124,11 +126,12 @@ def heatwaveJud(name,percent,dirpath1,outputpath):
     print("Heat wave duration has been calculated successfully")
     """计算热浪发生频率"""
     freimg = np.empty((height,width))
-    
     for i in range(width):
         for j in range(height):
             freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
     print("Heat wave frequency has been calculated successfully")
+    durimg=ma.masked_where(Igs[0]==ndv,durimg)
+    freimg=ma.masked_where(Igs[0]==ndv,freimg)
     write_img(durimg, durname, im_proj, im_geotrans, outputpath)
     write_img(freimg, frename, im_proj, im_geotrans, outputpath)
     # return heatwaveimg, durimg, freimg
@@ -161,11 +164,13 @@ def main():
             'Novosibirsk': 'rus'
         }
     for region in regionnames:
+        print("#"*120)
+        print(region)
         name = region
         dirPath1 =os.path.join(dirinputPath,name) 
         outputpath = diroutputPath
-        heatwaveJud(name, precent, dirPath1, outputpath)
-
+        heatwaveJud(name, precent, dirPath1)
+        
 if __name__ == "__main__":
     main()
 
