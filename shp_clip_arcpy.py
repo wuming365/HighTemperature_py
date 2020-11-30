@@ -6,11 +6,15 @@ import os
 import shutil
 arcpy.CheckOutExtension("Spatial")
 arcpy.env.parallelProcessingFactor = "0" #防止并行报错
+# 这三个可以一样
 input_path_hospital = r"H:\high_temperture202011\zanshi"
 input_path_road=r"H:\high_temperture202011\road"
 input_path_waterway=r"H:\high_temperture202011\waterway"
+
+# 这两个不要一样，第一个用来存distance，第二个用来存过程数据
 output_path = r"H:\high_temperture202011\result_data\RoadHospiWater"
 path_turn = r"H:\high_temperture202011\turn"
+
 path_clip=r"H:\high_temperture202011\extent"
 regionnames = {
                 'Abbas': 'irn',
@@ -38,17 +42,20 @@ regionnames = {
 for region in regionnames:
     regionname = region
     countryname = regionnames[region]
+    clipshp="{0}\\{1}.shp".format(path_clip,regionname)
+    # hospital
     country_poi="{0}\\{1}_pois_osm.shp".format(input_path_hospital,countryname) #python2
     region_turn_hospital="hospital_{}_{}".format(countryname,regionname) # layer
-    distance_hospital="{0}\\hospital_EucDistance_2020_{1}.tif".format(path_turn,regionname)
-    clipshp="{0}\\{1}.shp".format(path_clip,regionname)
+    distance_hospital="{0}\\hospital_EucDistance_2020_{1}.tif".format(output_path,regionname)
+    # road
     country_road="{0}\\{1}_roads_osm.shp".format(input_path_road,countryname) #python2
-    distance_road="{0}\\road_EucDistance_2020_{1}.tif".format(path_turn,regionname)
+    distance_road="{0}\\road_EucDistance_2020_{1}.tif".format(output_path,regionname)
+    # water
     country_waterway="{0}\\{1}_waterway_osm.shp".format(input_path_waterway,countryname) #python2
     buffer_region="{0}\\{1}_waterway_buf.shp".format(path_turn,regionname) #python2
     country_water="{0}\\{1}_water_osm.shp".format(r"H:\high_temperture202011\water",countryname) #python2
     output_water="{0}\\{1}_{2}_water_osm.shp".format(path_turn,countryname,regionname)
-    distance_water="{0}\\water_EucDistance_2020_{1}.tif".format(path_turn,regionname)
+    distance_water="{0}\\water_EucDistance_2020_{1}.tif".format(output_path,regionname)
     #整个国家太大，将外接矩形扩大一些
     extent = arcpy.Describe(clipshp).extent  # 得到8个 后面有4个NaN
     a=str(extent).split(" ")[:4]
@@ -59,13 +66,13 @@ for region in regionnames:
     a[3]+=0.3
     a=map(str,a)
     extent = " ".join(a)  # 这里只需要四个数字组成的字符串
-    arcpy.env.extent=extent # 不要设置extent，否则会按照小区域进行计算
+    arcpy.env.extent=extent # 按照小区域进行计算
     # 创建图层文件并选择
-    # arcpy.MakeFeatureLayer_management(in_features=country_poi, out_layer=region_turn_hospital, where_clause='"fclass" = \'hospital\'', workspace="", field_info="FID FID VISIBLE NONE;Shape Shape VISIBLE NONE;osm_id osm_id VISIBLE NONE;code code VISIBLE NONE;fclass fclass VISIBLE NONE;name name VISIBLE NONE")
+    arcpy.MakeFeatureLayer_management(in_features=country_poi, out_layer=region_turn_hospital, where_clause='"fclass" = \'hospital\'', workspace="", field_info="FID FID VISIBLE NONE;Shape Shape VISIBLE NONE;osm_id osm_id VISIBLE NONE;code code VISIBLE NONE;fclass fclass VISIBLE NONE;name name VISIBLE NONE")
     # 从poi中选择hospital
     arcpy.env.mask=clipshp # mask的不是shp的最小外接矩形，需要再裁剪一下
-    # arcpy.gp.EucDistance_sa(region_turn_hospital, distance_hospital, "", "0.00083333333", "")
-    # arcpy.gp.EucDistance_sa(country_road, distance_road, "", "0.00083333333", "")
+    arcpy.gp.EucDistance_sa(region_turn_hospital, distance_hospital, "", "0.00083333333", "")
+    arcpy.gp.EucDistance_sa(country_road, distance_road, "", "0.00083333333", "")
     # waterway生成缓冲区并与water合并后计算欧氏距离
     if not os.path.exists(buffer_region): #arcpy不会自动覆盖，避免调试失败删除文件才可继续，在所有输出上判断是否存在
         arcpy.Buffer_analysis(in_features=country_waterway, out_feature_class=buffer_region, buffer_distance_or_field="width", line_side="FULL", line_end_type="ROUND", dissolve_option="ALL", dissolve_field="", method="PLANAR")
