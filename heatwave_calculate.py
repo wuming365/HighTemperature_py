@@ -94,9 +94,13 @@ def GetpercentImages(Igs,percent):
     return perImages
 
 def getHeatWaveFreq(b):
-    c=''.join(str(i) for i in b)
-    d=np.array([len(i) for i in c.split('0')])
-    return len(d[d>=3])
+    if np.max(b)!=0:
+        b=b.astype(np.int32) #关键，把浮点型转换为整数型
+        c=''.join(str(i) for i in b)
+        d=np.array([len(i) for i in c.split('0')])
+        return len(d[d>=3])
+    else:
+        return 0
 
 def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
     """判断是否发生热浪"""
@@ -105,38 +109,42 @@ def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
     #dirpath1影像所在路径
     #outputpath影像输出路径
     Igs, im_geotrans, im_proj = openImages(dirpath1)
-    durname = name + "HT_duration_2015.tif"
-    frename = name + "HT_frequency.tif"
+    durname = name + "_HT_duration_2015.tif"
+    frename = name + "_HT_frequency.tif"
     perImage = GetpercentImages(Igs, percent)
     Comparevalue=max(perImage,30)
     height, width = Igs[0].shape
     heatwaveimg = []
+    
     with tqdm(enumerate(Igs)) as t:
         for i,Ig in t:
             newImage = np.empty((height, width))
             newImage[Ig>Comparevalue]=1
             heatwaveimg.append(newImage)
             t.set_description(f"Page{i+1} has finished")
+    
+    heatwaveimg=np.transpose(heatwaveimg) #将每页某行某列的数值组合成列表的一个维度
     """计算热浪持续时间"""
-    durimg = np.empty((height, width))
-    heatwaveimg=np.transpose(heatwaveimg)
-    with tqdm(range(width)) as t:
-        for j in t:
-            for i in range(0, height):
-                durimg[i][j] += sum(heatwaveimg[j][i])
-            t.set_description(f"Processing col{j}")
-    print("Heat wave duration has been calculated successfully")
+    if not os.path.exists(os.path.join(outputpath,durname)):    
+        durimg = np.empty((height, width))
+        with tqdm(range(width)) as t:
+            for j in t:
+                for i in range(0, height):
+                    durimg[i][j] += np.sum(heatwaveimg[j][i])
+                t.set_description(f"duration processing col{j}")
+        print("Heat wave duration has been calculated successfully")
+        durimg=ma.masked_where(Igs[0]==ndv,durimg).filled(ndv)
+        write_img(durimg, durname, im_proj, im_geotrans, outputpath)
     """计算热浪发生频率"""
+    # if not os.path.exists(os.path.join(outputpath,frename)):
     freimg = np.empty((height,width))
-    with tqdm(range(width)):
+    with tqdm(range(width)) as t:
         for i in t:
             for j in range(height):
                 freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
-            t.set_description(f"Processing col{i}")
+            t.set_description(f"frequency Processing col{i}")
     print("Heat wave frequency has been calculated successfully")
-    durimg=ma.masked_where(Igs[0]==ndv,durimg)
-    freimg=ma.masked_where(Igs[0]==ndv,freimg)
-    write_img(durimg, durname, im_proj, im_geotrans, outputpath)
+    freimg=ma.masked_where(Igs[0]==ndv,freimg).filled(ndv)
     write_img(freimg, frename, im_proj, im_geotrans, outputpath)
     # return heatwaveimg, durimg, freimg
 
@@ -164,8 +172,8 @@ def main():
             'Warsaw': 'pol',
             'Yawan': 'idn',
             'Valencia': 'esp',
-            'Ekaterinburg': 'rus',
-            'Novosibirsk': 'rus'
+            # 'Ekaterinburg': 'rus',
+            # 'Novosibirsk': 'rus'
         }
 
     for region in regionnames:
