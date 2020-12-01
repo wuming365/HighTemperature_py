@@ -15,6 +15,18 @@ IMSClip = {
     'Mumbai': 'Processed',
     'Tashkent': 'Processed',
     'Teran': 'ImperviousMap_E50N40.tif',
+    'Ankara'：'ImperviousMap_E30N40.tif', 'ImperviousMap_E30N50.tif'
+    'Piraeus'：'ImperviousMap_E20N40.tif'
+    'Colombo'：'ImperviousMap_E80N10.tif', 'ImperviousMap_E70N10.tif'
+    'Hambantota'：'ImperviousMap_E80N10.tif'
+    'Melaka'：'ImperviousMap_E100N10.tif'
+    'Kuantan'：'ImperviousMap_E100N10.tif'
+    'Minsk'：'ImperviousMap_E20N60.tif'
+    'Warsaw'：'ImperviousMap_E20N60.tif'
+    'Yawan'：'ImperviousMap_E100N0.tif'
+    'Novosibirsk'：'ImperviousMap_E80N60.tif'
+    'Ekaterinburg'：'ImperviousMap_E50N60.tif', 'ImperviousMap_E60N60.tif'
+    'Valencia': '空'
 }
 path_dirori = r"H:\high_temperture202011\virrs"
 path_dirext = r"H:\high_temperture202011\extent"
