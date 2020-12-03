@@ -152,27 +152,48 @@ def clipTiff(path_inputraster, path_outputraster, path_clipshp, ndv):
 
 def main():
     regionnames = {
-                    # 'Abbas': 'irn',
-                    # 'Karachi': 'pak',
-                    # 'Alexandria': 'egy',
-                    # 'Gawdar': 'pak',
-                    'Kolkata': 'ind',
-                    # 'Maldives': 'mdv',
-                    # 'Mumbai': 'ind',
-                    # 'Tashkent': 'uzb',
-                    # 'Teran': 'irn'
-                    }
+        # 'Abbas': 'irn',
+        # 'Karachi': 'pak',
+        # 'Alexandria': 'egy',
+        # 'Gawdar': 'pak',
+        # 'Kolkata': 'ind',
+        # 'Maldives': 'mdv',
+        # 'Mumbai': 'ind',
+        # 'Tashkent': 'uzb',
+        # 'Teran': 'irn',
+        # 'Ankara': 'tur',
+        # 'Piraeus': 'grc',
+        # 'Melaka': 'mys',
+        # 'Kuantan': 'mys',
+        # 'Hambantota': 'lka',
+        # 'Colombo': 'lka',
+        # 'Minsk': 'blr',
+        # 'Warsaw': 'pol',
+        # 'Yawan': 'idn',
+        # 'Valencia': 'esp',
+        'Ekaterinburg': 'rus',
+        'Novosibirsk': 'rus'
+    }
     ndv = -3.4028234663852886e+38
-    path_dirinput = r"H:\high_temperture202011\turn"
-    path_dirshp = r"H:\high_temperture202011\extent"
-    path_dirout = r"H:\high_temperture202011\result_data\NDGDPVIIMS"
+    #ndv=255
+    path_dirinput = r"E:\high_temperture202011"
+    path_dirshp = r"E:\High temperature heat wave vulnerability\extent"
+    path_dirout = r"G:\high_temperture202011\turn"
     with tqdm(regionnames) as t:
         for region in t:
             regionname = region
             countryname = regionnames[region]
-            path_inputraster = f"{path_dirinput}\\{regionname}_GDP_2015.tif" #python3
-            path_clipshp = path_dirshp+"\\"+regionname+".shp"
-            path_outputraster = path_dirout+"\\"+regionname+"_GDP_2015.tif"
+            path_inputraster = f"{path_dirinput}\\{regionname}_road_Euc_2020.tif" #python3
+            path_clipshp = f"{path_dirshp}\\{regionname}.shp"
+            path_outputraster = f"{path_dirout}\\{regionname}_road_Euc_2020.tif"
+            clipTiff(path_inputraster, path_outputraster, path_clipshp, ndv)
+
+            path_inputraster = f"{path_dirinput}\\{regionname}_hospital_Euc_2020.tif" #python3
+            path_outputraster = f"{path_dirout}\\{regionname}_hospital_Euc_2020.tif"
+            clipTiff(path_inputraster, path_outputraster, path_clipshp, ndv)
+
+            path_inputraster = f"{path_dirinput}\\{regionname}_water_Euc_2020.tif" #python3
+            path_outputraster = f"{path_dirout}\\{regionname}_water_Euc_2020.tif"
             clipTiff(path_inputraster, path_outputraster, path_clipshp, ndv)
             # t.set_description(regionname)
     #shutil.rmtree(path_dirinput)

@@ -13,8 +13,8 @@ input_path_waterway=r"G:\high_temperture202011\waterway"
 input_path_water=r"G:\high_temperture202011\water"
 
 # 这两个不要一样，第一个用来存distance，第二个用来存过程数据
-output_path = r"E:\high_temperture202011\turn"
-path_turn = r"E:\high_temperture202011\turn"
+output_path = r"E:\high_temperture202011"
+path_turn = r"E:\high_temperture202011"
 
 path_clip=r"G:\high_temperture202011\extent"
 regionnames = {
@@ -27,18 +27,18 @@ regionnames = {
                 # 'Mumbai': 'ind',
                 # 'Tashkent': 'uzb',
                 # 'Teran': 'irn',
-                'Ankara': 'tur',
-                'Piraeus': 'grc',
-                'Melaka': 'mys',
-                'Kuantan': 'mys',
-                'Hambantota': 'lka',
-                'Colombo': 'lka',
-                'Minsk': 'blr',
-                'Warsaw': 'pol',
+                # 'Ankara': 'tur',
+                # 'Piraeus': 'grc',
+                # 'Melaka': 'mys',
+                # 'Kuantan': 'mys',
+                # 'Hambantota': 'lka',
+                # 'Colombo': 'lka',
+                # 'Minsk': 'blr',
+                # 'Warsaw': 'pol',
                 # 'Yawan': 'idn',
                 # 'Valencia': 'esp',
-                # 'Ekaterinburg': 'rus',
-                # 'Novosibirsk': 'rus'
+                'Ekaterinburg': 'rus2',
+                'Novosibirsk': 'rus1'
                 }
 region_extra=0.1
 for region in regionnames:

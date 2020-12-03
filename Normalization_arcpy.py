@@ -12,7 +12,7 @@ indexnames = {
     'HT_duration': 1,
     'pop': 1,
     'deltaY': 1,
-    'delatYpeople': 1,
+    'deltaYpeople': 1,
     'NDVI': 1,
     'virrs': 1,
     'GDP': 1,
@@ -27,7 +27,6 @@ indexnames = {
 
 
 def Normalize(path_input, path_output, isPositive):
-    print ("Processing " + path_input.split("\\")[-1])
     try:
         maxValue = arcpy.GetRasterProperties_management(path_input, "MAXIMUM")
     except arcgisscripting.ExecuteError:
@@ -39,29 +38,38 @@ def Normalize(path_input, path_output, isPositive):
     minValue = arcpy.GetRasterProperties_management(path_input, "MINIMUM")
     minValue = minValue.getOutput(0)
     # print(maxValue)
-    if float(maxValue)-float(minValue)!=0:
+    if float(maxValue)-float(minValue) != 0:
         # print ("Processing " + path_input.split("\\")[-1])
         if isPositive:
             NormalizationRaster = (
                 Raster(path_input)-float(minValue))/(float(maxValue)-float(minValue))
+            # print(path_input)
+            # print(str(NormalizationRaster.height)+" "+str(Raster(path_input).height))
         else:
             NormalizationRaster = (
                 float(maxValue)-Raster(path_input))/(float(maxValue)-float(minValue))
     else:
         # print("max and min equal 0")
-        NormalizationRaster=Raster(path_input)
+        NormalizationRaster = Raster(path_input)
 
     if not os.path.exists(path_output):
         NormalizationRaster.save(path_output)
+        print ("Processing " + path_input.split("\\")[-1])
+    else:
+        print(path_input.split("\\")[-1] + "already exists")
     # return 1
+
 
 def getIndexname(filename):
     a = filename.split("_")
-    
+
     if len(a) == 4:
-        return a[2]
+        if a[1] == "HT":
+            return a[1]+"_"+a[2]
+        else:
+            return a[2]
     else:
-        m=a[1].split(".")[0]
+        m = a[1].split(".")[0]
         return m
 
 
@@ -78,9 +86,9 @@ def mkdir(path):
 
 
 def main():
-    path_dirinput = r"H:\high_temperture202011\result_data"
+    path_dirinput = r"G:\high_temperture202011\result_data"
     calcu = ["positive", "negative"]
-    path_diroutput = r"H:\high_temperture202011\result_normalized"
+    path_diroutput = r"G:\high_temperture202011\result_normalized"
     for name in calcu:
         path_dir = "{}\\{}".format(path_dirinput, name)
         for _, _, filenames in os.walk(path_dir):
@@ -96,7 +104,7 @@ def main():
 
 def main_testIndex():
 
-    path_input = r"H:\high_temperture202011\result_data"
+    path_input = r"G:\high_temperture202011\result_data"
     calcu = ["positive", "negative"]
     b = 0
     for name in calcu:
@@ -105,29 +113,31 @@ def main_testIndex():
             for filename in filenames:
                 if filename[-4:] == ".tif":
                     index = getIndexname(filename)
+                    print(index)
                     b += 1
                     if index not in indexnames:
                         print ("Error")
                         return
-    print (b/9)
+    print (b/12)
 
-def main_testNormalization():
-    path_dirinput = r"H:\high_temperture202011\result_data"
-    calcu = ["positive", "negative"]
-    path_output = r"H:\high_temperture202011\result_normalized"
-    num=0
-    for name in calcu:
-        path_dir = "{}\\{}".format(path_dirinput, name)
-        for _, _, filenames in os.walk(path_dir):
-            for filename in filenames:
-                if filename[-4:] == ".tif":
-                    index = getIndexname(filename)
-                    path_index = path_output+"\\"+index
-                    # mkdir(path_index)
-                    path_input = path_dir+"\\"+filename
-                    path_output = path_index+"\\"+filename
-                    num+=Normalize(path_input, path_output, name == "positive")
-    print(num)
+# def main_testNormalization():
+#     path_dirinput = r"H:\high_temperture202011\result_data"
+#     calcu = ["positive", "negative"]
+#     path_output = r"H:\high_temperture202011\result_normalized"
+#     num=0
+#     for name in calcu:
+#         path_dir = "{}\\{}".format(path_dirinput, name)
+#         for _, _, filenames in os.walk(path_dir):
+#             for filename in filenames:
+#                 if filename[-4:] == ".tif":
+#                     index = getIndexname(filename)
+#                     path_index = path_output+"\\"+index
+#                     # mkdir(path_index)
+#                     path_input = path_dir+"\\"+filename
+#                     path_output = path_index+"\\"+filename
+#                     num+=Normalize(path_input, path_output, name == "positive")
+#     print(num)
+
 
 if __name__ == "__main__":
     main()

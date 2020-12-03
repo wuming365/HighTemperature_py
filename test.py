@@ -57,7 +57,27 @@ import time
 
 # a=np.array([[[1,2],[2,3]],[[1,2],[2,3]],[[1,3],[1,3]],[[2,4],[4,2]]])
 # a=ma.masked_where(a==1,a)
-a="ma.tif"
-b="ma"
-print(a.split(".")[0])
-print(b.split(".")[0])
+# a="ma.tif"
+# b="ma"
+# print(a.split(".")[0])
+# print(b.split(".")[0])
+
+# import gdal
+# import numpy as np
+# import os
+# import time
+# import numpy.ma as ma
+# def getHeatWaveFreq(b):
+#     b=b.astype(np.int32)
+#     c=''.join(str(i) for i in b)
+#     d=np.array([len(i) for i in c.split('0')])
+#     return len(d[d>=3])
+
+
+# a=np.random.randint(2,size=50)
+# a=a.astype(np.float64)
+# print(a)
+# print(getHeatWaveFreq(a))
+driver = gdal.GetDriverByName("GTiff")
+dataset = driver.Create(r"D:\a.tif", 100, 10, 1, gdal.GDT_Byte)
+del dataset

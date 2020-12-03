@@ -95,7 +95,7 @@ def GetpercentImages(Igs,percent):
 
 def getHeatWaveFreq(b):
     if np.max(b)!=0:
-        b=b.astype(np.int32) #关键，把浮点型转换为整数型
+        b=b.astype(np.int32) #关键，把浮点型转换为整数型,否则结果会很小"00.10"过分割
         c=''.join(str(i) for i in b)
         d=np.array([len(i) for i in c.split('0')])
         return len(d[d>=3])
@@ -110,7 +110,7 @@ def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
     #outputpath影像输出路径
     Igs, im_geotrans, im_proj = openImages(dirpath1)
     durname = name + "_HT_duration_2015.tif"
-    frename = name + "_HT_frequency.tif"
+    frename = name + "_HT_frequency_2015.tif"
     perImage = GetpercentImages(Igs, percent)
     Comparevalue=max(perImage,30)
     height, width = Igs[0].shape
@@ -150,8 +150,8 @@ def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
 
 def main():
     precent = 95
-    dirinputPath=r"G:\extent\4_HTEMPX"
-    diroutputPath=r"G:\high_temperture202011\result_data\heatwave"
+    dirinputPath=r"I:\RasterCalculater\data"
+    diroutputPath=r"G:\high_temperture202011\turn"
     regionnames = {
             # 'Abbas': 'irn',
             # 'Karachi': 'pak',
@@ -161,7 +161,7 @@ def main():
             # 'Maldives': 'mdv',
             # 'Mumbai': 'ind',
             # 'Tashkent': 'uzb',
-            # 'Teran': 'irn',
+            # 'Teran': 'irn',   
             'Ankara': 'tur',
             'Piraeus': 'grc',
             'Melaka': 'mys',
@@ -172,8 +172,8 @@ def main():
             'Warsaw': 'pol',
             'Yawan': 'idn',
             'Valencia': 'esp',
-            # 'Ekaterinburg': 'rus',
-            # 'Novosibirsk': 'rus'
+            'Ekaterinburg': 'rus',
+            'Novosibirsk': 'rus'
         }
 
     for region in regionnames:
