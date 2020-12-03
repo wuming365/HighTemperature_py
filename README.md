@@ -1,6 +1,11 @@
 # highemperature_py
 
  
+<details>  
+<summary>点击查看详细内容</summary>  
+<pre>aaaa</pre>
+<pre>bbbb</pre>
+</details>
 
  - 文件树
 	```
