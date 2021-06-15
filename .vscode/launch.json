@@ -10,9 +10,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "xdebugSettings": {
-                "max_children": 3000,
-           }
+        //     "xdebugSettings": {
+        //         "max_children": 3000,
+        //    }
         }
     ]
 }

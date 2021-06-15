@@ -4,10 +4,10 @@ import os.path
 import re
 from collections import namedtuple
 
-import gdal
+from osgeo import gdal
 import numpy as np
 import numpy.ma as ma
-import ogr
+from osgeo import ogr
 import shapefile
 import xlrd
 from scipy import stats
@@ -16,68 +16,51 @@ from tqdm.std import trange
 
 import time
 
-# data=numpy.random.randint(5,size=(2,3,4))
-# print(data)
-# print(numpy.transpose(data))
-# print(numpy.transpose(numpy.transpose(data)))
-# ndv=3
-# mode,count=stats.mode(data)
-# a="Karachi20150102.tif"
-# print(a[18:])
-# print(data.max(axis=0))
-# dataa=np.array([5,4,3,2,1])
-# suma=0
-# print([suma+a for a in dataa])
-# data2=numpy.array([1,9,8,6,7])
+# NDV = -3.4028234663852886e+38
+NDV = -9999
 
 
-# data2[data2<2]=10
-# print(numpy.append(data,dataa,axis=0))
-# for i in trange(1,101,ascii=True,desc="ninhao"):
-#     time.sleep(0.05)
-# a=ma.masked_where(data==1,data)+1
-# print(a.filled(fill_value=1000))
-# p=numpy.percentile(data[0],numpy.array([50,75,80]))
-# print(p)
-# a=numpy.zeros((10000,10000))
-# b=numpy.zeros((10000,10000))
-# c=numpy.zeros((10000,10000))
+def mkdir(path):
+    """
+    创建文件夹
+    """
+    folder = os.path.exists(path)
+    foldername = path.split("\\")[-1]
 
-# b=np.random.randint(2,size=1000000)
-# time1_start=time.perf_counter()
-# c=''.join(str(i) for i in b)
-# d=np.array([len(i) for i in c.split('0')])
-# print(len(d[d>=3]))
-# print(time1_end-time1_start)
-# time2_start=time.perf_counter()
-# c=np.split(b,np.where(np.diff(b)<0)[0]+1)
-# d=np.array([np.sum(i) for i in c])
-# print(len(d[d>=3]))
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs(path)  # makedirs 创建文件时如果路径不存在会创建这个路径
+        print("The folder " + foldername + " is created")
+
+    # else:
+    # print("There is a folder called " + foldername)
 
 
-# a=np.array([[[1,2],[2,3]],[[1,2],[2,3]],[[1,3],[1,3]],[[2,4],[4,2]]])
-# a=ma.masked_where(a==1,a)
-# a="ma.tif"
-# b="ma"
-# print(a.split(".")[0])
-# print(b.split(".")[0])
+def clipTiff(path_inputraster, path_outputraster, path_clipshp, NDV=NDV):
+    """
+    裁剪影像
+    path_inputraster:str
+    path_outputraster:str
+    path_clipshp:str
+    """
+    input_raster = gdal.Open(path_inputraster)
+    mkdir(os.path.dirname(path_outputraster))
+    # 两个投影一样
+    r = shapefile.Reader(path_clipshp)
+    ds = gdal.Warp(path_outputraster,
+                   input_raster,
+                   format='GTiff',
+                   outputBounds=r.bbox,
+                   cutlineDSName=path_clipshp,
+                   dstNodata=NDV)
+    ds = None
+    print("Cliping " + path_outputraster)
 
-# import gdal
-# import numpy as np
-# import os
-# import time
-# import numpy.ma as ma
-# def getHeatWaveFreq(b):
-#     b=b.astype(np.int32)
-#     c=''.join(str(i) for i in b)
-#     d=np.array([len(i) for i in c.split('0')])
-#     return len(d[d>=3])
 
-
-# a=np.random.randint(2,size=50)
-# a=a.astype(np.float64)
-# print(a)
-# print(getHeatWaveFreq(a))
-driver = gdal.GetDriverByName("GTiff")
-dataset = driver.Create(r"D:\a.tif", 100, 10, 1, gdal.GDT_Byte)
-del dataset
+path = r"../2010/turn"
+path_out = r"../2010/turn_1"
+path_clip = r"../extent"
+filenames = [i for i in os.listdir(path) if i.endswith(".tif")]
+for filename in filenames:
+    clipTiff(os.path.join(path, filename), os.path.join(path_out, filename),
+             os.path.join(path_clip,
+                          filename.split("_")[0] + ".shp"))

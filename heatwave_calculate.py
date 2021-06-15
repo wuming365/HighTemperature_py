@@ -1,26 +1,12 @@
-import gdal
+from osgeo import gdal
 import numpy as np
 import os
 import time
 import numpy.ma as ma
 from tqdm import tqdm
 from tqdm import trange
-def openSingleImage(imagefilename):
-    """读取影像文件"""
-    dataset = gdal.Open(imagefilename)
-    im_width = dataset.RasterXSize  # 列数
-    im_height = dataset.RasterYSize  # 行数
-    im_bands = dataset.RasterCount  # 波段数
-    im_geotrans = dataset.GetGeoTransform()  # 仿射矩阵
-    # 共有六个参数，分别代表分表代表左上角x坐标；东西方向上图像的分辨率；如果北边朝上，地图的旋转角度，0表示图像的行与x轴平行；左上角y坐标；
-    # 如果北边朝上，地图的旋转角度，0表示图像的列与y轴平行；南北方向上地图的分辨率。
-    im_proj = dataset.GetProjection()  # 地图投影信息
-    im_band = dataset.GetRasterBand(1)
-    ndv=im_band.GetNoDataValue()
-    Image = im_band.ReadAsArray(0, 0, im_width, im_height)
-    del dataset
-    # 关闭图像进程
-    return np.double(Image), im_geotrans, im_proj
+
+
 def write_img(im_data, filename, im_proj, im_geotrans, dirpath):
     """写影像"""
     # im_data被写的影像
@@ -62,7 +48,8 @@ def write_img(im_data, filename, im_proj, im_geotrans, dirpath):
         for i in t:
             # 创建文件
             driver = gdal.GetDriverByName("GTiff")
-            dataset = driver.Create(newpath[i], im_width, im_height, im_bands, datatype)
+            dataset = driver.Create(newpath[i], im_width, im_height, im_bands,
+                                    datatype)
             if (dataset != None):
                 dataset.SetGeoTransform(im_geotrans)  # 写入仿射变换参数
                 dataset.SetProjection(im_proj)  # 写入投影
@@ -71,6 +58,8 @@ def write_img(im_data, filename, im_proj, im_geotrans, dirpath):
                 dataset.GetRasterBand(band + 1).WriteArray(newim_data[i])
             del dataset
             t.set_description(newfilename[i] + " has been successfully built")
+
+
 def openImages(dirpath):
     """
     打开工作文件夹中的所有影像
@@ -83,49 +72,59 @@ def openImages(dirpath):
         with tqdm(filenames) as t:
             for filename in t:
                 if filename[-4:] == ".tif":
-                    Image, im_geotrans, im_proj = openSingleImage(dirPath + "\\" + filename)
+                    Image, im_geotrans, im_proj = openSingleImage(dirPath +
+                                                                  "\\" +
+                                                                  filename)
                     Igs.append(Image)
                     idate = idate + 1
                     t.set_description(filename + " is already open……")
     return np.array(Igs), im_geotrans, im_proj
-def GetpercentImages(Igs,percent):
+
+
+def GetpercentImages(Igs, percent):
     """计算时间序列图像百分位数 """
     perImages = np.percentile(Igs, percent)
     return perImages
 
+
 def getHeatWaveFreq(b):
-    if np.max(b)!=0:
-        b=b.astype(np.int32) #关键，把浮点型转换为整数型,否则结果会很小"00.10"过分割
-        c=''.join(str(i) for i in b)
-        d=np.array([len(i) for i in c.split('0')])
-        return len(d[d>=3])
+    if np.max(b) != 0:
+        b = b.astype(np.int32)  #关键，把浮点型转换为整数型,否则结果会很小"00.10"过分割
+        c = ''.join(str(i) for i in b)
+        d = np.array([len(i) for i in c.split('0')])
+        return len(d[d >= 3])
     else:
         return 0
 
-def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
+
+def heatwaveJud(name,
+                percent,
+                dirpath1,
+                outputpath,
+                ndv=-3.4028234663852886e+38):
     """判断是否发生热浪"""
     #name节点名称
     #perpath阈值标准所在路径
     #dirpath1影像所在路径
     #outputpath影像输出路径
     Igs, im_geotrans, im_proj = openImages(dirpath1)
-    durname = name + "_HT_duration_2015.tif"
-    frename = name + "_HT_frequency_2015.tif"
+    durname = f"{name}_HT_duration_{YEAR}.tif"
+    frename = f"{name}_HT_frequency_{YEAR}.tif"
     perImage = GetpercentImages(Igs, percent)
-    Comparevalue=max(perImage,30)
+    Comparevalue = max(perImage, 30)
     height, width = Igs[0].shape
     heatwaveimg = []
-    
+
     with tqdm(enumerate(Igs)) as t:
-        for i,Ig in t:
+        for i, Ig in t:
             newImage = np.empty((height, width))
-            newImage[Ig>Comparevalue]=1
+            newImage[Ig > Comparevalue] = 1
             heatwaveimg.append(newImage)
             t.set_description(f"Page{i+1} has finished")
-    
-    heatwaveimg=np.transpose(heatwaveimg) #将每页某行某列的数值组合成列表的一个维度
+
+    heatwaveimg = np.transpose(heatwaveimg)  #将每页某行某列的数值组合成列表的一个维度
     """计算热浪持续时间"""
-    if not os.path.exists(os.path.join(outputpath,durname)):    
+    if not os.path.exists(os.path.join(outputpath, durname)):
         durimg = np.empty((height, width))
         with tqdm(range(width)) as t:
             for j in t:
@@ -133,59 +132,35 @@ def heatwaveJud(name,percent,dirpath1,outputpath,ndv = -3.4028234663852886e+38):
                     durimg[i][j] += np.sum(heatwaveimg[j][i])
                 t.set_description(f"duration processing col{j}")
         print("Heat wave duration has been calculated successfully")
-        durimg=ma.masked_where(Igs[0]==ndv,durimg).filled(ndv)
+        durimg = ma.masked_where(Igs[0] == ndv, durimg).filled(ndv)
         write_img(durimg, durname, im_proj, im_geotrans, outputpath)
     """计算热浪发生频率"""
     # if not os.path.exists(os.path.join(outputpath,frename)):
-    freimg = np.empty((height,width))
+    freimg = np.empty((height, width))
     with tqdm(range(width)) as t:
         for i in t:
             for j in range(height):
-                freimg[j][i]=getHeatWaveFreq(heatwaveimg[i][j]) 
+                freimg[j][i] = getHeatWaveFreq(heatwaveimg[i][j])
             t.set_description(f"frequency Processing col{i}")
     print("Heat wave frequency has been calculated successfully")
-    freimg=ma.masked_where(Igs[0]==ndv,freimg).filled(ndv)
+    freimg = ma.masked_where(Igs[0] == ndv, freimg).filled(ndv)
     write_img(freimg, frename, im_proj, im_geotrans, outputpath)
     # return heatwaveimg, durimg, freimg
 
+
 def main():
     precent = 95
-    dirinputPath=r"I:\RasterCalculater\data"
-    diroutputPath=r"G:\high_temperture202011\turn"
-    regionnames = {
-            # 'Abbas': 'irn',
-            # 'Karachi': 'pak',
-            # 'Alexandria': 'egy',
-            # 'Gawdar': 'pak',
-            # 'Kolkata': 'ind',
-            # 'Maldives': 'mdv',
-            # 'Mumbai': 'ind',
-            # 'Tashkent': 'uzb',
-            # 'Teran': 'irn',   
-            'Ankara': 'tur',
-            'Piraeus': 'grc',
-            'Melaka': 'mys',
-            'Kuantan': 'mys',
-            'Hambantota': 'lka',
-            'Colombo': 'lka',
-            'Minsk': 'blr',
-            'Warsaw': 'pol',
-            'Yawan': 'idn',
-            'Valencia': 'esp',
-            'Ekaterinburg': 'rus',
-            'Novosibirsk': 'rus'
-        }
+    dirinputPath = fr"../{YEAR}/origin_Temperature"
+    diroutputPath = fr"../{YEAR}/turn"
 
-    for region in regionnames:
-        print("#"*120)
+    for region in REGIONNAMES:
+        print("#" * 120)
         print(region)
         name = region
-        dirPath1 =os.path.join(dirinputPath,name) 
+        dirPath1 = os.path.join(dirinputPath, name)
         outputpath = diroutputPath
-        heatwaveJud(name, precent, dirPath1,outputpath)
-        
+        heatwaveJud(name, precent, dirPath1, outputpath)
+
+
 if __name__ == "__main__":
     main()
-
-
-

@@ -9,7 +9,7 @@
     "python.testing.pytestEnabled": false,
     "python.testing.nosetestsEnabled": true,
     "python.testing.unittestEnabled": false,
-    "python.pythonPath": "D:\\Python27\\ArcGIS10.6\\python.exe",
+    "python.pythonPath": "d:\\Python27\\ArcGIS10.6\\python.exe",
     "python.testing.pytestArgs": [
         "__pycache__"
     ],
