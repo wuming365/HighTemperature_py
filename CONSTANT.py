@@ -1,42 +1,41 @@
 # -*- coding: utf-8 -*-
 import os
 import numpy as np
-# from osgeo import gdal
 ##########
 
-REGIONCNAMES={
-		"Abbas":["阿巴斯","Iran","伊朗"],
-		"Alexandria":["亚特兰大港","Egypt","埃及"],
-		"Ankara":["安卡拉","Turkey","土耳其"],
-		"Colombo":["科伦坡","Sri Lanka","斯里兰卡"],
-		# "Djibouti":["吉布提","Djibouti","吉布提"],
-		"Ekaterinburg":["叶卡捷琳堡","Russia","俄罗斯"],
-		"Gawdar":["瓜达尔港","Pakistan","巴基斯坦"],
-		"Hambantota":["汉班托塔港","Sri Lanka","斯里兰卡"],
-		"Karachi":["卡拉奇","Pakistan","巴基斯坦"],
-		"Kolkata":["加尔各答","india","印度"],
-		"Kuantan":["关丹","Malaysia","马来西亚"],
-		"Maldives":["马尔代夫","Maldives","马尔代夫"],
-		"Melaka":["马六甲","Malaysia","马来西亚"],
-		"Minsk":["明斯克","Belarus","白俄罗斯"],
-		"Mumbai":["孟买","India","印度"],
-		"Novosibirsk":["新西伯利亚","Russia","俄罗斯"],
-		# "Nursultan":["努尔苏丹（原阿斯塔纳）","Kazakhstan","哈萨克斯坦"],
-		"Piraeus":["比雷艾夫斯港","Greece","希腊"],
-		"Tashkent":["塔什干","Uzbekistan","乌兹别克斯坦"],
-		"Teran":["德黑兰","Iran","伊朗"],
-		# "Valencia":["瓦伦西亚","Spain","西班牙"],
-		"Warsaw":["华沙","Poland","波兰"],
-		"Yawan":["雅万高铁","Indonesia","印度尼西亚"],
-		}
+REGIONCNAMES = {
+    "Abbas": ["阿巴斯", "Iran", "伊朗"],
+    "Alexandria": ["亚特兰大港", "Egypt", "埃及"],
+    "Ankara": ["安卡拉", "Turkey", "土耳其"],
+    "Colombo": ["科伦坡", "Sri Lanka", "斯里兰卡"],
+    # "Djibouti":["吉布提","Djibouti","吉布提"],
+    "Ekaterinburg": ["叶卡捷琳堡", "Russia", "俄罗斯"],
+    "Gawdar": ["瓜达尔港", "Pakistan", "巴基斯坦"],
+    "Hambantota": ["汉班托塔港", "Sri Lanka", "斯里兰卡"],
+    "Karachi": ["卡拉奇", "Pakistan", "巴基斯坦"],
+    "Kolkata": ["加尔各答", "india", "印度"],
+    "Kuantan": ["关丹", "Malaysia", "马来西亚"],
+    "Maldives": ["马尔代夫", "Maldives", "马尔代夫"],
+    "Melaka": ["马六甲", "Malaysia", "马来西亚"],
+    "Minsk": ["明斯克", "Belarus", "白俄罗斯"],
+    "Mumbai": ["孟买", "India", "印度"],
+    "Novosibirsk": ["新西伯利亚", "Russia", "俄罗斯"],
+    # "Nursultan":["努尔苏丹（原阿斯塔纳）","Kazakhstan","哈萨克斯坦"],
+    "Piraeus": ["比雷艾夫斯港", "Greece", "希腊"],
+    "Tashkent": ["塔什干", "Uzbekistan", "乌兹别克斯坦"],
+    "Teran": ["德黑兰", "Iran", "伊朗"],
+    # "Valencia":["瓦伦西亚","Spain","西班牙"],
+    "Warsaw": ["华沙", "Poland", "波兰"],
+    "Yawan": ["雅万高铁", "Indonesia", "印度尼西亚"],
+}
 
-INDEXCNAMES={
-		"Danger":"危险性",
-		"Expo":"暴露度",
-		"Vulner":"脆弱性",
-		"DPE":"孕灾环境",
-		"Final":"最终结果",
-		}
+INDEXCNAMES = {
+    "Danger": "危险性",
+    "Expo": "暴露度",
+    "Vulner": "脆弱性",
+    "DPE": "孕灾环境",
+    "Final": "最终结果",
+}
 
 CALCU = ["positive", "negative"]
 ###########
@@ -93,8 +92,10 @@ INDEX1 = {
     'HT_frequency': ['HT_frequency'],
     'HT_duration': ['HT_duration'],
     'pop': ['pop'],
-    'deltaY': ['deltaY_000_980', 'deltaY_980_990', 'deltaY_990_995', 'deltaY_995_100'],
-    'deltaYpeople': ['deltaYpeople_00_65', 'deltaYpeople_65_80', 'deltaYpeople_80_00'],
+    'deltaY':
+    ['deltaY_000_980', 'deltaY_980_990', 'deltaY_990_995', 'deltaY_995_100'],
+    'deltaYpeople':
+    ['deltaYpeople_00_65', 'deltaYpeople_65_80', 'deltaYpeople_80_00'],
     'NDVI': ['NDVI'],
     'Nightlight': ['Nightlight'],
     'GDP': ['GDP'],
@@ -116,9 +117,8 @@ INDEX2FILE = {
     'DPE': ['DPE']
 }
 
-INDEX3 = {
-    'Final': ['Danger', 'Expo', 'Vulner', 'DPE']
-}
+INDEX3 = {'Final': ['Danger', 'Expo', 'Vulner', 'DPE']}
+
 
 def mkdir(path):
     """
@@ -129,40 +129,7 @@ def mkdir(path):
 
     if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
         os.makedirs(path)  # makedirs 创建文件时如果路径不存在会创建这个路径
-        print("The folder "+foldername+" is created")
-        
-# def openSingleImage(imagefilename):
-#     """
-#     打开遥感影像
-#     """
-#     dataset = gdal.Open(imagefilename)
-#     im_width = dataset.RasterXSize  # 列数
-#     im_height = dataset.RasterYSize  # 行数
-#     # im_bands = dataset.RasterCount  # 波段数
-#     im_geotrans = dataset.GetGeoTransform()  # 仿射矩阵
-#     im_proj = dataset.GetProjection()  # 地图投影信息
-#     im_band = dataset.GetRasterBand(1)
-#     Image = im_band.ReadAsArray(0, 0, im_width, im_height)
-#     del dataset
-#     # 关闭图像进程
-#     return np.double(Image), im_geotrans, im_proj
+        print("The folder " + foldername + " is created")
 
-# def clipTiff(path_inputraster, path_outputraster, path_clipshp, NDV):
-    """
-    裁剪影像
-    path_inputraster:str
-    path_outputraster:str
-    path_clipshp:str
-    """
-    input_raster = gdal.Open(path_inputraster)
-    mkdir(os.path.dirname(path_outputraster))
-    # 两个投影一样
-    r = shapefile.Reader(path_clipshp)
-    ds = gdal.Warp(path_outputraster,
-                   input_raster,
-                   format='GTiff',
-                   outputBounds=r.bbox,
-                   cutlineDSName=path_clipshp,
-                   dstNodata=NDV)
-    ds = None
+
 #####################
